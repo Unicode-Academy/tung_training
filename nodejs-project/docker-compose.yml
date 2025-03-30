@@ -1,0 +1,41 @@
+version: '3'
+volumes:
+  mariadb:
+    driver: local
+networks:
+  db:
+    driver: bridge
+services:
+  nodejs: 
+    build: ./
+    env_file:
+      - .env
+  nginx: 
+    build: ./nginx
+    ports:
+      - 8002:8002
+  mariadb:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: unicode123
+    expose:
+        - "3306"
+    ports:
+        - "3306:3306"
+    volumes:
+     - mariadb:/var/lib/mysql
+    networks:
+      db:             
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    expose:
+      - "8080"
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306 
+    networks:
+      db:
