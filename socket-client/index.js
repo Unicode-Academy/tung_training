@@ -1,10 +1,10 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
-const socketURL = `ws://localhost:8080/chat`;
-const socket = io(socketURL, {
-  extraHeaders: {
-    "x-user": localStorage.getItem("user"),
-  },
-});
+// const socketURL = `ws://localhost:8080/chat`;
+// const socket = io(socketURL, {
+//   extraHeaders: {
+//     "x-user": localStorage.getItem("user"),
+//   },
+// });
 // const btn = document.querySelector(".btn");
 // btn.addEventListener("click", () => {
 //   socket.emit("send-message", "Hello message from client");
@@ -54,12 +54,22 @@ const socket = io(socketURL, {
 // });
 
 //Socket notification
-const socketNotification = io.connect("ws://localhost:8080/notification", {
+const socketNotification = io("ws://localhost:8080/notification", {
   extraHeaders: {
-    Authorization: `Bearer ahihi`,
+    authorization: `Bearer ahihi1`,
   },
 });
+
+socketNotification.on("exception", (error) => {
+  console.log(error);
+});
+
 socketNotification.on("new-message", (event) => {
   console.log(event);
 });
 socketNotification.emit("send-message", "OK chưa?");
+
+socketNotification.on("new-message-2", (event) => {
+  console.log(event);
+});
+socketNotification.emit("send-message-2", "OK chưa 2?");

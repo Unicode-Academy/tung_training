@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { WebsocketGuard } from 'src/guards/websocket/websocket.guard';
 
 @WebSocketGateway(8080, {
   cors: {
@@ -37,6 +39,14 @@ export class NotificationGateway
     console.log('Notification');
 
     this.server.emit('new-message', payload);
+  }
+
+  @UseGuards(WebsocketGuard)
+  @SubscribeMessage('send-message-2')
+  handleSendMessage2(client: any, payload: any) {
+    console.log('Notification 2');
+
+    this.server.emit('new-message-2', payload);
   }
 }
 
