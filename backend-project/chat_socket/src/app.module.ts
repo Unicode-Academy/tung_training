@@ -11,6 +11,8 @@ import { PostsModule } from './modules/posts/posts.module';
 import { Post } from './modules/posts/entities/post.entity';
 import { RoomModule } from './modules/room/room.module';
 import { Room } from './modules/room/entities/room.entity';
+import { AuthModule } from './modules/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -27,10 +29,16 @@ import { Room } from './modules/room/entities/room.entity';
       entities: [User, Phone, Post, Room],
       synchronize: true, //Tự động đồng bộ tới database từ entity
     }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRED },
+    }),
     UserModule,
     PhoneModule,
     PostsModule,
     RoomModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

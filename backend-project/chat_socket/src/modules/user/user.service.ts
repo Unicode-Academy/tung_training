@@ -6,6 +6,8 @@ import CreateUserDto from './dto/create-user.dto';
 import UpdateUserDto from './dto/update-user.dto';
 import { PhoneService } from '../phone/phone.service';
 import { PostsService } from '../posts/posts.service';
+import { RoomService } from '../room/room.service';
+import Hash from 'src/utils/hashing';
 
 @Injectable()
 export class UserService {
@@ -14,6 +16,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private phoneService: PhoneService,
     @Inject(forwardRef(() => PostsService)) private postService: PostsService,
+    private roomService: RoomService,
   ) {}
   findAll() {
     return this.userRepository.find({
@@ -23,18 +26,21 @@ export class UserService {
     });
   }
 
-  findOne(id: number, relations: any = {}) {
-    return this.userRepository.findOneOrFail({
+  async findOne(id: number, relations: any = {}) {
+    const user = await this.userRepository.findOneOrFail({
       where: { id },
       relations,
     });
+    delete user.password;
+    return user;
   }
 
-  async create(body: CreateUserDto & { phone?: string }) {
-    const { phone: phoneValue, ...userData } = body;
-    const user = await this.userRepository.save(userData);
-    const phone = await this.phoneService.create({ phone: phoneValue, user });
-
+  async create(body: CreateUserDto) {
+    body.password = Hash.make(body.password);
+    // const { phone: phoneValue, ...userData } = body;
+    const user = await this.userRepository.save(body);
+    // const phone = await this.phoneService.create({ phone: phoneValue, user });
+    return user;
     // return this.userRepository.save(userData);
   }
 
@@ -66,5 +72,27 @@ export class UserService {
   async getPosts(userId: number) {
     const { posts } = await this.findOne(userId, { posts: true });
     return posts;
+  }
+
+  async createRoom(userId: number, body: any) {
+    const user = await this.findOne(userId);
+    const room = await this.roomService.create({ ...body, users: [user] });
+    return room;
+  }
+
+  async assignRoom(userId: number, body: any) {
+    const user = await this.findOne(userId);
+    const rooms = await this.roomService.getRoomsByIds(body);
+    user.rooms = rooms;
+    return this.userRepository.save(user);
+  }
+  async getRooms(userId: number) {
+    return this.findOne(userId, {
+      rooms: true,
+    });
+  }
+
+  async findByEmail(email: string) {
+    return this.userRepository.findOneBy({ email });
   }
 }

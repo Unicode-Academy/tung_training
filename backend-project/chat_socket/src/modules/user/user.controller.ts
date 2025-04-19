@@ -69,4 +69,24 @@ export class UserController {
     }
     return posts;
   }
+
+  @Post(':id/rooms')
+  async createRoom(@Param('id') userId: number, @Body() body: any) {
+    return this.userService.createRoom(userId, body);
+  }
+
+  @Put(':id/rooms')
+  async assignRoom(@Param('id') userId: number, @Body() body: any) {
+    return this.userService.assignRoom(userId, body);
+  }
+
+  @Delete(':id/rooms')
+  async deleteRoom(@Param('id') userId: number) {
+    return this.userService.assignRoom(userId, []);
+  }
+
+  @Get(':id/rooms')
+  async getRooms(@Param('id') userId: number) {
+    return this.userService.getRooms(userId);
+  }
 }

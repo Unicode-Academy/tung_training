@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entites/user.entity';
 import { PhoneModule } from '../phone/phone.module';
 import { PostsModule } from '../posts/posts.module';
+import { RoomModule } from '../room/room.module';
 
 @Module({
   controllers: [UserController],
@@ -13,6 +14,7 @@ import { PostsModule } from '../posts/posts.module';
     TypeOrmModule.forFeature([User]),
     PhoneModule,
     forwardRef(() => PostsModule),
+    RoomModule,
   ],
   exports: [UserService],
 })
