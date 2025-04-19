@@ -1,5 +1,15 @@
 import { Phone } from 'src/modules/phone/entites/phone.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Post } from 'src/modules/posts/entities/post.entity';
+import { Room } from 'src/modules/room/entities/room.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -23,6 +33,23 @@ export class User {
 
   @OneToOne(() => Phone, (phone) => phone.user)
   phone: Phone;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
+
+  @ManyToMany(() => Room, (room) => room.users)
+  @JoinTable({
+    name: 'users_room',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'room_id',
+      referencedColumnName: 'id',
+    },
+  })
+  rooms: Room[];
 
   @Column('timestamp', {
     default: () => 'CURRENT_TIMESTAMP',

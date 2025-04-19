@@ -7,6 +7,10 @@ import { UserModule } from './modules/user/user.module';
 import { User } from './modules/user/entites/user.entity';
 import { PhoneModule } from './modules/phone/phone.module';
 import { Phone } from './modules/phone/entites/phone.entity';
+import { PostsModule } from './modules/posts/posts.module';
+import { Post } from './modules/posts/entities/post.entity';
+import { RoomModule } from './modules/room/room.module';
+import { Room } from './modules/room/entities/room.entity';
 
 @Module({
   imports: [
@@ -20,11 +24,13 @@ import { Phone } from './modules/phone/entites/phone.entity';
       username: 'root',
       password: '123456',
       database: 'nestjs_chat',
-      entities: [User, Phone],
+      entities: [User, Phone, Post, Room],
       synchronize: true, //Tự động đồng bộ tới database từ entity
     }),
     UserModule,
     PhoneModule,
+    PostsModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],
