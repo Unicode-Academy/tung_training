@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <video
+        id="my-video"
+        width="300"
+        height="300"
+        autoplay
+        muted
+        style="border: 1px solid red"
+      ></video>
+      <video
+        id="peer-video"
+        width="300"
+        height="300"
+        autoplay
+        style="border: 1px solid red"
+      ></video>
+    </div>
+    <button id="start-btn">Start</button>
+    <input type="text" id="room-input" placeholder="Room name..." />
+    <button id="create-btn" disabled>Create Room</button>
+    <button id="join-btn">Join</button>
+    <div class="msg"></div>
+    <script type="module" src="index.js"></script>
+  </body>
+</html>

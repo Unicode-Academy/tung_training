@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Request,
@@ -32,6 +33,23 @@ export class AuthController {
       throw new UnauthorizedException('Email or password is incorrect');
     }
     return user;
+  }
+  @Post('refresh-token')
+  async refreshToken(@Body() { refreshToken }: any) {
+    if (!refreshToken) {
+      throw new BadRequestException('Please provide fresh token');
+    }
+    const token = await this.authService.refreshToken(refreshToken);
+    if (!token) {
+      throw new UnauthorizedException('Unathorized');
+    }
+    return token;
+  }
+  @Delete('logout')
+  @UseGuards(AuthGuard)
+  logout(@Request() req: Request & { user: { [key: string]: string } }) {
+    const user = req.user;
+    return this.authService.logout(user.token);
   }
   @Get('profile')
   @UseGuards(AuthGuard)

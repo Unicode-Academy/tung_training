@@ -13,6 +13,7 @@ import { RoomModule } from './modules/room/room.module';
 import { Room } from './modules/room/entities/room.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -33,6 +34,10 @@ import { JwtModule } from '@nestjs/jwt';
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRED },
+    }),
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
     }),
     UserModule,
     PhoneModule,
