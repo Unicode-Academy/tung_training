@@ -42,7 +42,12 @@ const handleCreateMeet = () => {
   if (isLoaded.value) {
     if (isSignedIn.value) {
       const uuid = uuidv4();
-      router.push({ name: "meet", params: { id: uuid } });
+      // router.push({
+      //   name: "meet",
+      //   params: { id: uuid },
+      //   query: { type: "create" },
+      // });
+      window.location.href = `/${uuid}?type=create`;
     } else {
       clerk.value.openSignIn();
     }
