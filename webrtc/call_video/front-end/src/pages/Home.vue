@@ -6,12 +6,12 @@
       </h1>
       <p class="text-2xl">Kết nối, cộng tác và ăn mừng ở mọi nơi với</p>
       <div class="mt-5 flex gap-5">
-        <a
-          href="#"
+        <button
           class="inline-block bg-blue-600 text-white py-2 px-5 rounded-full cursor-pointer"
+          @click="handleCreateMeet"
         >
           Cuộc gọi mới
-        </a>
+        </button>
         <input
           type="text"
           class="outline-none py-2 px-5 rounded-xl border border-gray-400"
@@ -30,3 +30,22 @@
     </div>
   </div>
 </template>
+<script setup>
+import { useClerk, useUser } from "@clerk/vue";
+
+const clerk = useClerk();
+const { isSignedIn, isLoaded } = useUser();
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const handleCreateMeet = () => {
+  if (isLoaded.value) {
+    if (isSignedIn.value) {
+      const uuid = uuidv4();
+      router.push({ name: "meet", params: { id: uuid } });
+    } else {
+      clerk.value.openSignIn();
+    }
+  }
+};
+</script>
