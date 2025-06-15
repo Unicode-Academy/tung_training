@@ -25,6 +25,8 @@ export class AppGateway
 
   rooms: RoomInterface[] = [];
 
+  hostSocketId: string;
+
   afterInit(server: Server) {
     console.log('Server initialized');
   }
@@ -34,13 +36,18 @@ export class AppGateway
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
-  }
+    const room = this.rooms.find((room) =>
+      room.clients.find((user: any) => user.socketId === client.id),
+    );
+    if (room) {
+      const user = room.clients[0];
+      room.clients = room.clients.filter(
+        (user: any) => user.socketId !== client.id,
+      );
 
-  // @SubscribeMessage('message')
-  // handleMessage(client: Socket, payload: string): void {
-  //   this.server.emit('message', `Server: Received your message -> ${payload}`);
-  // }
+      this.server.to(this.hostSocketId).emit('leave-meet', user);
+    }
+  }
 
   @SubscribeMessage('create-meet')
   createMeet(client: Socket, payload: any) {
@@ -49,11 +56,44 @@ export class AppGateway
       return;
     }
     this.rooms.push({ ...payload, clients: [] });
-    this.server.emit('create-meet', payload);
+    this.hostSocketId = client.id;
+    this.server.emit('created-meet', this.rooms);
 
-    console.log(this.rooms);
+    // console.log(this.rooms);
   }
 
   @SubscribeMessage('join-meet')
-  joinMeet(client: Socket, payload: any) {}
+  joinMeet(client: Socket, payload: any) {
+    const room = this.rooms.find((room) => room.roomId === payload.roomId);
+    if (!room) {
+      client.emit('error', 'Room not found');
+      return;
+    }
+    payload.user.socketId = client.id;
+    room.clients.push(payload.user);
+    this.server.to(this.hostSocketId).emit('joined-meet', room.clients);
+
+    // console.log(this.rooms);
+  }
+
+  @SubscribeMessage('offer')
+  offer(client: Socket, payload: any) {
+    const { offer, socketId } = payload;
+    this.server.to(socketId).emit('offer', payload);
+  }
+
+  @SubscribeMessage('answer')
+  answer(client: Socket, payload: any) {
+    this.server.to(this.hostSocketId).emit('answer', payload);
+  }
+
+  @SubscribeMessage('candidate')
+  candidate(client: Socket, payload: any) {
+    const { message, socketId } = payload;
+    if (!socketId) {
+      this.server.to(this.hostSocketId).emit('candidate', message);
+      return;
+    }
+    this.server.to(socketId).emit('candidate', message);
+  }
 }
